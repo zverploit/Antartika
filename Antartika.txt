@@ -1,0 +1,857 @@
+-- Pastikan game sudah dimuat
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+
+-- Konfigurasi untuk menyembunyikan nama
+getgenv().Config = {
+    Headless = true,
+    FakeDisplayName = "FakeDisplayName ",
+    FakeName = "FakeName",
+    FakeId = 1, -- input id
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/CF-Trail/NameHider/main/MainScript.lua"))()
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local VirtualUser = game:GetService("VirtualUser")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+
+-- Predefined Coordinates
+local coordinates = {
+    Camp1 = {
+        {x = -6043.1, y = -154.8, z = -59.9},
+        {x = -5918.0, y = -158.5, z = -4.3},
+        {x = -5829.4, y = -154.5, z = -43.2},
+        {x = -5706.0, y = -145.6, z = -103.7},
+        {x = -5697.1, y = -140.9, z = -124.7},
+        {x = -5632.2, y = -135.4, z = -191.1},
+        {x = -5466.7, y = -146.8, z = -179.0},
+        {x = -5361.0, y = -142.9, z = -226.4},
+        {x = -5288.8, y = -93.5, z = -234.5},
+        {x = -5281.4, y = -99.6, z = -89.9},
+        {x = -5269.3, y = -95.6, z = 54.3},
+        {x = -5073.7, y = -75.6, z = 176.6},
+        {x = -4920.3, y = -107.7, z = 174.4},
+        {x = -4829.6, y = -110.2, z = 49.4},
+        {x = -4391.1, y = 28.9, z = -123.7},
+        {x = -4317.5, y = 104.6, z = -205.9},
+        {x = -4132.9, y = 117.2, z = -130.6},
+        {x = -3967.8, y = 150.6, z = 57.3},
+        {x = -3787.5, y = 164.5, z = 94.0},
+        {x = -3891.3, y = 183.6, z = 273.4},
+        {x = -3768.1, y = 213.7, z = 246.5},
+        {x = -3719.1, y = 224.4, z = 236.2}
+    },
+    Camp2 = {
+        {x = -3717.7, y = 230.3, z = 263.6},
+        {x = -3595.7, y = 230.7, z = 193.4},
+        {x = -3546.2, y = 253.7, z = 184.5},
+        {x = -3402.4, y = 260.7, z = 195.9},
+        {x = -3353.5, y = 283.3, z = 163.4},
+        {x = -3246.4, y = 275.5, z = 164.2},
+        {x = -3233.1, y = 317.5, z = 184.3},
+        {x = -3104.8, y = 321.0, z = 71.8},
+        {x = -2956.4, y = 287.3, z = -148.5},
+        {x = -2786.9, y = 259.0, z = -233.7},
+        {x = -2774.1, y = 227.6, z = -373.6},
+        {x = -2639.9, y = 197.3, z = -363.0},
+        {x = -2300.4, y = 100.4, z = -74.0},
+        {x = -1818.1, y = 93.2, z = -113.5},
+        {x = -1354.8, y = 88.4, z = -232.2},
+        {x = -837.5, y = 77.2, z = -250.5},
+        {x = -401.6, y = 68.2, z = -273.9},
+        {x = 413.9, y = 65.8, z = -167.5},
+        {x = 823.9, y = 55.3, z = -174.3},
+        {x = 1324.5, y = 4.2, z = -175.2},
+        {x = 1525.6, y = 32.2, z = -157.4},
+        {x = 1562.4, y = 64.4, z = -116.4},
+        {x = 1734.0, y = 105.0, z = -106.6},
+        {x = 1789.6, y = 104.9, z = -138.1}
+    },
+    Camp3 = {
+        {x = 1800.1, y = 109.5, z = -163.6},
+        {x = 1800.4, y = 109.9, z = -164.0},
+        {x = 2030.9, y = 215.3, z = -124.1},
+        {x = 2759.4, y = 522.4, z = -272.2},
+        {x = 2985.7, y = 698.7, z = -366.1},
+        {x = 3139.9, y = 852.4, z = -189.1},
+        {x = 3347.5, y = 1024.6, z = 280.3},
+        {x = 3424.9, y = 1124.2, z = 353.3},
+        {x = 3769.1, y = 1462.0, z = -256.4},
+        {x = 4123.2, y = 1155.2, z = -358.0},
+        {x = 4593.0, y = 1093.8, z = 59.3},
+        {x = 4864.9, y = 892.8, z = 461.4},
+        {x = 5230.7, y = 758.8, z = -34.5},
+        {x = 5389.8, y = 705.3, z = -45.8},
+        {x = 5439.5, y = 611.5, z = 54.6},
+        {x = 5439.8, y = 364.9, z = -249.7},
+        {x = 5595.4, y = 345.5, z = 26.0},
+        {x = 5733.7, y = 320.4, z = -58.4},
+        {x = 5839.2, y = 320.4, z = -100.5},
+        {x = 5874.8, y = 320.4, z = -73.4},
+        {x = 5885.3, y = 320.4, z = -44.9},
+        {x = 5885.5, y = 320.4, z = 3.7},
+        {x = 5892.3, y = 320.4, z = -18.5}
+    },
+    Camp4 = {
+        {x = 5885.2, y = 324.9, z = 6.0},
+        {x = 6427.0, y = 389.1, z = 98.8},
+        {x = 6641.9, y = 351.5, z = 296.0},
+        {x = 6822.3, y = 353.4, z = 356.9},
+        {x = 7309.6, y = 320.4, z = 268.4},
+        {x = 7667.8, y = 315.6, z = 224.3},
+        {x = 7887.2, y = 310.7, z = 248.0},
+        {x = 7978.1, y = 295.1, z = 305.8},
+        {x = 8037.3, y = 334.2, z = 478.6},
+        {x = 8047.6, y = 332.4, z = 649.4},
+        {x = 8131.2, y = 328.1, z = 743.4},
+        {x = 8217.3, y = 376.3, z = 942.4},
+        {x = 8250.3, y = 382.4, z = 981.5},
+        {x = 8364.3, y = 472.1, z = 1060.3},
+        {x = 8498.3, y = 560.6, z = 791.3},
+        {x = 8621.2, y = 584.6, z = 490.9},
+        {x = 8837.0, y = 592.4, z = 131.4},
+        {x = 8839.8, y = 584.4, z = -131.3},
+        {x = 8996.8, y = 608.9, z = 146.8},
+        {x = 9000.9, y = 601.6, z = 84.1},
+        {x = 8992.4, y = 595.0, z = 103.3}
+    },
+    Finish = {
+        {x = 9087.9, y = 596.4, z = 67.5},
+        {x = 9336.6, y = 583.1, z = 0.4},
+        {x = 9411.9, y = 593.9, z = 81.5},
+        {x = 9484.2, y = 601.0, z = 195.2},
+        {x = 9520.6, y = 592.8, z = 86.0},
+        {x = 9542.1, y = 539.0, z = 75.5},
+        {x = 9591.2, y = 598.0, z = 16.8},
+        {x = 9599.9, y = 572.7, z = -71.0},
+        {x = 9770.6, y = 550.7, z = 17.5},
+        {x = 9823.4, y = 592.4, z = 39.4},
+        {x = 9909.0, y = 592.4, z = 28.4},
+        {x = 10008.9, y = 594.3, z = -4.0},
+        {x = 10051.8, y = 571.3, z = -14.0},
+        {x = 10244.4, y = 552.8, z = 8.1},
+        {x = 10487.1, y = 559.9, z = 39.2},
+        {x = 10632.7, y = 556.4, z = 51.5},
+        {x = 10741.7, y = 548.8, z = 69.4},
+        {x = 10914.7, y = 548.4, z = 44.9},
+        {x = 10986.4, y = 548.5, z = 12.5},
+        {x = 10939.8, y = 548.6, z = 126.3},
+        {x = 10992.9, y = 548.6, z = 111.5}
+    }
+}
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "JokoAntartikaAman"
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+screenGui.Parent = CoreGui
+
+-- Fallback to PlayerGui if CoreGui fails
+local function setGuiParent()
+    local success, err = pcall(function()
+        screenGui.Parent = CoreGui
+    end)
+    if not success then
+        screenGui.Parent = Players.LocalPlayer.PlayerGui
+        StarterGui:SetCore("SendNotification", {
+            Title = "Kesalahan GUI",
+            Text = "Menggunakan PlayerGui sebagai fallback",
+            Duration = 5
+        })
+    end
+end
+
+-- Create Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 160)
+frame.Position = UDim2.new(0.5, -100, 0.5, -80)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Parent = screenGui
+
+-- Create Title Label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.Text = "jokoantartikaaman"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+titleLabel.TextScaled = true
+titleLabel.Parent = frame
+
+-- Create Minimize Button
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 15, 0, 15)
+minimizeButton.Position = UDim2.new(1, -35, 0, 2)
+minimizeButton.Text = "-"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 0)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 0)
+minimizeButton.TextScaled = true
+minimizeButton.Parent = frame
+
+-- Create Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 15, 0, 15)
+closeButton.Position = UDim2.new(1, -15, 0, 2)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+closeButton.TextScaled = true
+closeButton.Parent = frame
+closeButton.MouseButton1Click:Connect(function()
+    screenGui.Enabled = false
+end)
+
+-- Create Start Expedition Button
+local startButtonExpedition = Instance.new("TextButton")
+startButtonExpedition.Size = UDim2.new(0.8, 0, 0, 30)
+startButtonExpedition.Position = UDim2.new(0.1, 0, 0, 40)
+startButtonExpedition.Text = "Start Expedition"
+startButtonExpedition.TextColor3 = Color3.fromRGB(255, 255, 255)
+startButtonExpedition.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+startButtonExpedition.TextScaled = true
+startButtonExpedition.Parent = frame
+
+-- Create Hide My Name Toggle Button and Overlay
+local hideNameEnabled = false
+local nameOverlay = nil
+local hideNameButton = Instance.new("TextButton")
+hideNameButton.Size = UDim2.new(0.8, 0, 0, 30)
+hideNameButton.Position = UDim2.new(0.1, 0, 0, 75)
+hideNameButton.Text = "Hide My Name: OFF"
+hideNameButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+hideNameButton.BackgroundColor3 = Color3.fromRGB(100, 0, 100)
+hideNameButton.TextScaled = true
+hideNameButton.Parent = frame
+hideNameButton.MouseButton1Click:Connect(function()
+    hideNameEnabled = not hideNameEnabled
+    hideNameButton.Text = "Hide My Name: " .. (hideNameEnabled and "ON" or "OFF")
+    local char = LocalPlayer.Character
+    if char then
+        if hideNameEnabled then
+            local success, err = pcall(function()
+                char.Humanoid.NameDisplayDistance = 0
+                for _, child in pairs(char:GetDescendants()) do
+                    if child:IsA("BillboardGui") or child:IsA("SurfaceGui") then
+                        if child:FindFirstChild("NameLabel") or child.Name:find("Name") then
+                            child.Enabled = false
+                        end
+                    end
+                end
+                -- Buat overlay untuk menyembunyikan nama di atas kepala
+                if not nameOverlay then
+                    nameOverlay = Instance.new("ScreenGui")
+                    nameOverlay.Name = "NameOverlayGui"
+                    nameOverlay.Parent = CoreGui
+                    local overlayFrame = Instance.new("Frame")
+                    overlayFrame.Size = UDim2.new(0, 140, 0, 112)
+                    overlayFrame.Position = UDim2.new(0.5, -70, 0, -100)
+                    overlayFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                    overlayFrame.BackgroundTransparency = 0
+                    overlayFrame.BorderSizePixel = 0
+                    overlayFrame.Parent = nameOverlay
+                    RunService.RenderStepped:Connect(function()
+                        if char and char:FindFirstChild("Head") then
+                            local headPos = Workspace.CurrentCamera:WorldToViewportPoint(char.Head.Position + Vector3.new(0, 2, 0))
+                            overlayFrame.Position = UDim2.new(0, headPos.X - 70, 0, headPos.Y - 150)
+                        end
+                    end)
+                end
+                nameOverlay.Enabled = true
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Hide Name",
+                    Text = "Mencoba menyembunyikan nama dengan overlay (lokal)",
+                    Duration = 3
+                })
+            end)
+            if not success then
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Error",
+                    Text = "Gagal menyembunyikan nama: " .. tostring(err) .. ". Nama mungkin dikontrol oleh server.",
+                    Duration = 5
+                })
+            end
+        else
+            local success, err = pcall(function()
+                char.Humanoid.NameDisplayDistance = 100
+                for _, child in pairs(char:GetDescendants()) do
+                    if child:IsA("BillboardGui") or child:IsA("SurfaceGui") then
+                        if child:FindFirstChild("NameLabel") or child.Name:find("Name") then
+                            child.Enabled = true
+                        end
+                    end
+                end
+                if nameOverlay then
+                    nameOverlay.Enabled = false
+                end
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Hide Name",
+                    Text = "Nama Anda ditampilkan kembali",
+                    Duration = 3
+                })
+            end)
+            if not success then
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Error",
+                    Text = "Gagal mengembalikan nama: " .. tostring(err),
+                    Duration = 5
+                })
+            end
+        end
+    end
+end)
+
+-- Create Left Bottom Text with Background
+local leftBottomGui = Instance.new("ScreenGui")
+leftBottomGui.Name = "LeftBottomTextGui"
+leftBottomGui.Parent = CoreGui
+local leftBottomFrame = Instance.new("Frame")
+leftBottomFrame.Size = UDim2.new(0, 180, 0, 100)
+leftBottomFrame.Position = UDim2.new(0, 10, 1, -110)
+leftBottomFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+leftBottomFrame.BackgroundTransparency = 0.7
+leftBottomFrame.BorderSizePixel = 0
+leftBottomFrame.Parent = leftBottomGui
+local leftBottomText = Instance.new("TextLabel")
+leftBottomText.Size = UDim2.new(1, 0, 1, 0)
+leftBottomText.Text = [[
+JASA JOKI
+LEGEND 20K
+HARD 15K
+VIP 70K
+TIMSAR 60K
+PASTI AMAN
+]]
+leftBottomText.TextColor3 = Color3.fromRGB(255, 255, 255)
+leftBottomText.BackgroundTransparency = 1
+leftBottomText.TextScaled = true
+leftBottomText.TextSize = 14
+leftBottomText.Parent = leftBottomFrame
+
+-- Teleport Function
+local isTeleporting = false
+local function teleportToCoords(coords)
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+        local humanoid = char.Humanoid
+        local success, err = pcall(function()
+            humanoid:ChangeState(Enum.HumanoidStateType.None)
+            char.HumanoidRootPart.CFrame = CFrame.new(coords.x, coords.y, coords.z)
+            wait(0.05)
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            StarterGui:SetCore("SendNotification", {
+                Title = "Teleported",
+                Text = string.format("Teleported to: X:%.1f, Y:%.1f, Z:%.1f", coords.x, coords.y, coords.z),
+                Duration = 3
+            })
+        end)
+        if not success then
+            StarterGui:SetCore("SendNotification", {
+                Title = "Teleport Error",
+                Text = "Failed to teleport: " .. tostring(err),
+                Duration = 3
+            })
+        end
+        return success
+    else
+        StarterGui:SetCore("SendNotification", {
+            Title = "Teleport Error",
+            Text = "Character or Humanoid not found",
+            Duration = 3
+        })
+        return false
+    end
+end
+
+-- Auto-Jump Function
+local function autoJump(count, delay, campName)
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local humanoid = char.Humanoid
+        for i = 1, count do
+            if not isTeleporting then break end
+            local success, err = pcall(function()
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Auto-Jump",
+                    Text = string.format("Jump %d of %d at %s", i, count, campName),
+                    Duration = 2
+                })
+            end)
+            if not success then
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Jump Error",
+                    Text = "Failed to jump: " .. tostring(err),
+                    Duration = 3
+                })
+                break
+            end
+            wait(delay)
+        end
+    else
+        StarterGui:SetCore("SendNotification", {
+            Title = "Jump Error",
+            Text = "Character or Humanoid not found",
+            Duration = 3
+        })
+    end
+end
+
+-- Auto-Drink Function
+local function autoDrink(campName)
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local rootPart = char.HumanoidRootPart
+        local proximityPrompts = {}
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") and obj.Parent.Name:find("WaterBottle") then
+                local distance = (rootPart.Position - obj.Parent.Position).Magnitude
+                if distance < 10 then
+                    table.insert(proximityPrompts, {Prompt = obj, Distance = distance})
+                end
+            end
+        end
+        if #proximityPrompts > 0 then
+            table.sort(proximityPrompts, function(a, b) return a.Distance < b.Distance end)
+            for i = 1, math.min(2, #proximityPrompts) do
+                if not isTeleporting then break end
+                local closestPrompt = proximityPrompts[i].Prompt
+                local success, err = pcall(function()
+                    fireproximityprompt(closestPrompt)
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Auto-Drink",
+                        Text = string.format("Drinking %d of 2 at %s", i, campName),
+                        Duration = 2
+                    })
+                end)
+                if not success then
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Drink Error",
+                        Text = "Failed to drink: " .. tostring(err),
+                        Duration = 3
+                    })
+                    break
+                end
+                wait(0.5)
+            end
+            if #proximityPrompts == 1 and isTeleporting then
+                local closestPrompt = proximityPrompts[1].Prompt
+                local success, err = pcall(function()
+                    fireproximityprompt(closestPrompt)
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Auto-Drink",
+                        Text = string.format("Drinking 2 of 2 at %s", campName),
+                        Duration = 2
+                    })
+                end)
+                if not success then
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Drink Error",
+                        Text = "Failed to drink second time: " .. tostring(err),
+                        Duration = 3
+                    })
+                end
+            end
+        else
+            StarterGui:SetCore("SendNotification", {
+                Title = "Drink Error",
+                Text = "No WaterBottle with ProximityPrompt found nearby at " .. campName,
+                Duration = 3
+            })
+        end
+    else
+        StarterGui:SetCore("SendNotification", {
+            Title = "Drink Error",
+            Text = "Character or HumanoidRootPart not found",
+            Duration = 3
+        })
+    end
+end
+
+-- Checkpoint Detection
+local function isNearCheckpoint(coords)
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local playerPos = char.HumanoidRootPart.Position
+        local checkpointPos = Vector3.new(coords.x, coords.y, coords.z)
+        local distance = (playerPos - checkpointPos).Magnitude
+        return distance < 5
+    end
+    return false
+end
+
+-- Get Center Screen Function
+local function getCenterScreen()
+    local camera = Workspace.CurrentCamera
+    local viewportSize = camera.ViewportSize
+    return Vector2.new(viewportSize.X / 2, viewportSize.Y / 2)
+end
+
+-- Auto Click With Hotkey Function
+local function autoClickWithHotkey(campName)
+    local success, err = pcall(function()
+        -- Simulasi hotkey 2 untuk memegang Water Bottle
+        VirtualInputManager:SendKeyEvent(true, "Two", false, game)
+        wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, "Two", false, game)
+        print("Memegang Water Bottle dengan hotkey 2 di " .. campName)
+        StarterGui:SetCore("SendNotification", {
+            Title = "Auto-Click",
+            Text = "Memegang Water Bottle di " .. campName,
+            Duration = 2
+        })
+
+        -- 3x klik tengah layar dengan delay 4 detik
+        local center = getCenterScreen()
+        for i = 1, 3 do
+            local successClick, errClick = pcall(function()
+                VirtualUser:ClickButton1(Vector2.new(center.X, center.Y))
+            end)
+            if not successClick then
+                local successFallback, errFallback = pcall(function()
+                    UserInputService.InputBegan:Fire(Enum.UserInputType.MouseButton1, false)
+                end)
+                if not successFallback then
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Kesalahan Klik",
+                        Text = "Gagal mengklik: " .. tostring(errClick) .. " (Fallback gagal: " .. tostring(errFallback) .. ")",
+                        Duration = 5
+                    })
+                else
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Klik Otomatis",
+                        Text = "Menggunakan fallback UserInputService",
+                        Duration = 3
+                    })
+                end
+            end
+            print("Klik tengah ke-" .. i .. " di " .. campName)
+            StarterGui:SetCore("SendNotification", {
+                Title = "Auto-Click",
+                Text = "Klik tengah ke-" .. i .. " di " .. campName,
+                Duration = 2
+            })
+            if i == 1 or i == 2 then
+                wait(4) -- Delay 4 detik setelah klik pertama dan kedua
+            end
+        end
+
+        -- Pencet hotkey 2 lagi setelah 3x klik
+        VirtualInputManager:SendKeyEvent(true, "Two", false, game)
+        wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, "Two", false, game)
+        print("Pencet hotkey 2 lagi di " .. campName)
+        StarterGui:SetCore("SendNotification", {
+            Title = "Auto-Click",
+            Text = "Pencet hotkey 2 lagi di " .. campName,
+            Duration = 2
+        })
+    end)
+    if not success then
+        StarterGui:SetCore("SendNotification", {
+            Title = "Click Error",
+            Text = "Failed to process hotkey/click: " .. tostring(err),
+            Duration = 3
+        })
+    end
+end
+
+-- Teleport Sequence for a Specific Camp or Finish
+local function teleportSequence(campName, campCoords, jumpCount)
+    for i, coord in ipairs(campCoords) do
+        if not isTeleporting then return false end
+        local success = teleportToCoords(coord)
+        if not success then
+            return false
+        end
+        wait(3) -- 3-second delay between teleports
+
+        -- Simulasi gerakan maju setelah setiap teleport
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("Humanoid") and char:FindFirstChild("HumanoidRootPart") then
+            local humanoid = char.Humanoid
+            local rootPart = char.HumanoidRootPart
+
+            -- Simulasi berjalan maju sebentar
+            local stepCount = 5
+            if campName == "Camp 3" then stepCount = 15 end
+            if campName == "Camp 4" then stepCount = 13 end
+            if campName == "Finish" then stepCount = 13 end
+            for step = 1, stepCount do
+                local moveDir = rootPart.CFrame.LookVector * 0.5 -- Geser 0.5 unit ke depan
+                local successMove, errMove = pcall(function()
+                    humanoid:Move(moveDir, true)
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Movement Sync",
+                        Text = string.format("Simulating walk step %d of %d at %s", step, stepCount, campName),
+                        Duration = 2
+                    })
+                    wait(0.5) -- Delay kecil antar langkah
+                end)
+                if not successMove then
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Move Error",
+                        Text = "Failed to simulate walk: " .. tostring(errMove),
+                        Duration = 3
+                    })
+                    break
+                end
+            end
+            wait(1) -- Delay untuk sinkronisasi
+
+            -- Simulasi lompatan sekali
+            local successJump, errJump = pcall(function()
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Movement Sync",
+                    Text = "Simulating jump at " .. campName,
+                    Duration = 2
+                })
+                wait(1) -- Delay setelah lompatan
+            end)
+            if not successJump then
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Jump Error",
+                    Text = "Failed to simulate jump: " .. tostring(errJump),
+                    Duration = 3
+                })
+            end
+        end
+
+        -- Tambah autoClickWithHotkey pada koordinat tertentu
+        if campName == "Camp 3" then
+            if coord.x == 1800.1 and coord.y == 109.5 and coord.z == -163.6 then
+                for _ = 1, 2 do
+                    autoClickWithHotkey("Camp 3")
+                end
+            end
+            if coord.x == 5595.4 and coord.y == 345.5 and coord.z == 26.0 then
+                for _ = 1, 3 do
+                    autoClickWithHotkey("Camp 3")
+                end
+            end
+        end
+
+        if campName == "Camp 2" then
+            if coord.x == -3717.7 and coord.y == 230.3 and coord.z == 263.6 then
+                autoClickWithHotkey("Camp 2")
+            end
+            if coord.x == -3353.5 and coord.y == 283.3 and coord.z == 163.4 then
+                autoClickWithHotkey("Camp 2")
+            end
+        end
+
+        if campName == "Camp 4" then
+            if coord.x == 8037.3 and coord.y == 334.2 and coord.z == 478.6 then
+                autoClickWithHotkey("Camp 4")
+            end
+        end
+
+        if campName == "Finish" then
+            if coord.x == 10051.8 and coord.y == 571.3 and coord.z == -14.0 then
+                autoClickWithHotkey("Finish")
+            end
+        end
+
+        if i == #campCoords then
+            if campName == "Camp 3" then
+                -- Tambah delay lebih lama dan klik tambahan untuk Camp 3
+                wait(5) -- Delay 5 detik tambahan untuk sinkronisasi
+                local center = getCenterScreen()
+                for _ = 1, 2 do
+                    VirtualUser:ClickButton1(Vector2.new(center.X, center.Y))
+                    wait(1) -- Delay 1 detik antar klik
+                end
+            end
+            if isNearCheckpoint(coord) then
+                StarterGui:SetCore("SendNotification", {
+                    Title = campName .. " Reached",
+                    Text = "Starting drinking at " .. campName .. " checkpoint",
+                    Duration = 5
+                })
+                autoDrink(campName)
+                StarterGui:SetCore("SendNotification", {
+                    Title = campName .. " Reached",
+                    Text = "Starting " .. jumpCount .. " jumps at " .. campName .. " checkpoint",
+                    Duration = 5
+                })
+                autoJump(jumpCount, 3, campName)
+                autoClickWithHotkey(campName) -- Hotkey 2, 3x klik tengah, dan hotkey 2 lagi
+                if campName == "Finish" then
+                    -- Tidak ada block hitam lagi saat Finish
+                end
+                return true
+            else
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Teleport Complete",
+                    Text = "Reached final coordinate for " .. campName .. ", but checkpoint not confirmed",
+                    Duration = 5
+                })
+                return false
+            end
+        end
+    end
+    return false
+end
+
+-- Full Expedition Sequence with Loop
+local function startFullExpedition()
+    if isTeleporting then
+        isTeleporting = false
+        startButtonExpedition.Text = "Start Expedition"
+        startButtonExpedition.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+        StarterGui:SetCore("SendNotification", {
+            Title = "Expedition Stopped",
+            Text = "Full expedition sequence stopped",
+            Duration = 3
+        })
+    else
+        isTeleporting = true
+        startButtonExpedition.Text = "Stop Expedition"
+        startButtonExpedition.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+        spawn(function()
+            while isTeleporting do
+                local stages = {
+                    {name = "Camp 1", coords = coordinates.Camp1, jumpCount = 2},
+                    {name = "Camp 2", coords = coordinates.Camp2, jumpCount = 2},
+                    {name = "Camp 3", coords = coordinates.Camp3, jumpCount = 2},
+                    {name = "Camp 4", coords = coordinates.Camp4, jumpCount = 2},
+                    {name = "Finish", coords = coordinates.Finish, jumpCount = 2}
+                }
+                for _, stage in ipairs(stages) do
+                    if not isTeleporting then break end
+                    local success = teleportSequence(stage.name, stage.coords, stage.jumpCount)
+                    if not success then
+                        isTeleporting = false
+                        startButtonExpedition.Text = "Start Expedition"
+                        startButtonExpedition.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+                        StarterGui:SetCore("SendNotification", {
+                            Title = "Expedition Failed",
+                            Text = "Failed at " .. stage.name .. ". Check character or coordinates.",
+                            Duration = 5
+                        })
+                        break
+                    end
+                    if stage.name == "Finish" and isTeleporting then
+                        StarterGui:SetCore("SendNotification", {
+                            Title = "Expedition Complete",
+                            Text = "Reached Finish! Respawning in 30 seconds...",
+                            Duration = 5
+                        })
+                        wait(30) -- Delay 30 detik sebelum respawn
+                        local char = LocalPlayer.Character
+                        if char and char:FindFirstChild("HumanoidRootPart") then
+                            char:BreakJoints() -- Simulasi respawn dengan menghancurkan karakter
+                            wait(1) -- Tunggu karakter respawn
+                        end
+                    end
+                end
+                if not isTeleporting then break end
+                wait(30) -- Delay 30 detik setelah respawn sebelum memulai ulang
+            end
+            if isTeleporting then
+                isTeleporting = false
+                startButtonExpedition.Text = "Start Expedition"
+                startButtonExpedition.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Expedition Paused",
+                    Text = "Expedition paused. Restart to continue.",
+                    Duration = 5
+                })
+            end
+        end)
+    end
+end
+
+-- Connect Start Expedition Button
+startButtonExpedition.MouseButton1Click:Connect(startFullExpedition)
+
+-- Minimize Functionality
+local isMinimized = false
+local originalSize = frame.Size
+local originalPos = frame.Position
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        frame.Size = UDim2.new(0, 150, 0, 30)
+        frame.Position = UDim2.new(0.5, -75, 0, 0)
+        for _, child in pairs(frame:GetChildren()) do
+            if child ~= titleLabel and child ~= minimizeButton and child ~= closeButton then
+                child.Visible = false
+            end
+        end
+        minimizeButton.Text = "+"
+    else
+        frame.Size = originalSize
+        frame.Position = originalPos
+        for _, child in pairs(frame:GetChildren()) do
+            child.Visible = true
+        end
+        minimizeButton.Text = "-"
+    end
+end)
+
+-- Draggable Functionality
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+titleLabel.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+titleLabel.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        updateDrag(input)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        updateDrag(input)
+    end
+end)
+
+-- Ensure GUI visibility
+local function ensureGuiVisibility()
+    local success, err = pcall(function()
+        screenGui.Enabled = true
+        frame.Visible = true
+        setGuiParent()
+    end)
+    if not success then
+        pcall(function()
+            StarterGui:SetCore("SendNotification", {
+                Title = "Kesalahan GUI",
+                Text = "Mencoba ulang inisialisasi GUI: " .. tostring(err),
+                Duration = 5
+            })
+        end)
+        wait(1)
+        ensureGuiVisibility()
+    end
+end
+
+ensureGuiVisibility()
